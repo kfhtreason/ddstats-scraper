@@ -8,16 +8,17 @@ const float level2Threshold = 30, level3Threshold = 100, level4Threshold = 200, 
 Console.WindowWidth = 120;
 for (; ; )
 {
-	Console.WriteLine("Enter your user ID and press enter:");
-	int playerId = 0;
+	Console.WriteLine("Enter your player ID and press enter:");
+	uint playerId = 0;
 	while (playerId == 0)
-		_ = int.TryParse(Console.ReadLine(), out playerId);
+		_ = uint.TryParse(Console.ReadLine(), out playerId);
 
+	Console.WriteLine($"Fetching games for player with ID {playerId}...{Environment.NewLine}");
 	const int pageSize = int.MaxValue;
 	using HttpClient client = new HttpClient();
 	string responseString = await client.GetStringAsync($"https://ddstats.com/api/v2/game/recent?player_id={playerId}&page_size={pageSize}&page_num=1");
 	dynamic response = JsonConvert.DeserializeObject(responseString);
-	Console.WriteLine($"{Environment.NewLine}Found {response.total_game_count} games for player '{response.player_name}'.{Environment.NewLine}");
+	Console.WriteLine($"Found {response.total_game_count} games for player '{response.player_name}'.{Environment.NewLine}");
 
 	IEnumerable<dynamic> v3Games = response.games.ToObject<IEnumerable<dynamic>>();
 	v3Games = v3Games.Where(g => g.spawnset == "v3");
